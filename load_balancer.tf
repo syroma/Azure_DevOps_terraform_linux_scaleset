@@ -21,12 +21,34 @@ resource "azurerm_lb_backend_address_pool" "lb_backpool" {
   name            = "BackEndAddressPool"
 }
 
-resource "azurerm_lb_rule" "lb_rule" {
+resource "azurerm_lb_rule" "http_rule" {
   loadbalancer_id                = azurerm_lb.lb.id
-  name                           = "LBRule"
+  name                           = "http"
   protocol                       = "Tcp"
   frontend_port                  = 80
-  backend_port                   = 3389
+  backend_port                   = 80
   frontend_ip_configuration_name = "PublicIPAddress"
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lb_backpool.id]
+  probe_id                       = azurerm_lb_probe.lb_probe.id
+}
+
+resource "azurerm_lb_rule" "ssh_rule" {
+  loadbalancer_id                = azurerm_lb.lb.id
+  name                           = "ssh"
+  protocol                       = "Tcp"
+  frontend_port                  = 22
+  backend_port                   = 22
+  frontend_ip_configuration_name = "PublicIPAddress"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lb_backpool.id]
+  probe_id                       = azurerm_lb_probe.lb_probe.id
+}
+
+resource "azurerm_lb_probe" "lb_probe" {
+  loadbalancer_id     = azurerm_lb.lb.id
+  name                = "ssh-running-probe"
+  port                = 80
+  protocol            = "Http"
+  request_path        = "/index.html"
+  number_of_probes    = 3
+  interval_in_seconds = 5
 }

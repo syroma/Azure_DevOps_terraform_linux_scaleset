@@ -1,7 +1,7 @@
 variable "heading_one" {
-    description = "heading one title for index.html"
-    default = "hi im bob"
-    type = string
+  description = "heading one title for index.html"
+  default     = "hi im bob"
+  type        = string
 }
 
 variable "location" {}

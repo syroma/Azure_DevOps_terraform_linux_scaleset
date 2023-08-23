@@ -31,6 +31,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   instances           = var.instances
   admin_username      = var.admin_username
   user_data           = base64encode(templatefile("userdata.tftpl", local.data_inputs))
+  health_probe_id     = azurerm_lb_probe.lb_probe.id
 
   admin_ssh_key {
     username = var.admin_username
@@ -60,6 +61,11 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
       subnet_id                              = azurerm_subnet.subnet.id
       load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.lb_backpool.id]
     }
+  }
+
+  automatic_instance_repair {
+    enabled      = true
+    grace_period = "PT10M"
   }
 }
 
