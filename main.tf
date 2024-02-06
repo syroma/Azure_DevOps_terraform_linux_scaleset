@@ -5,7 +5,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.prefix}-resources"
+  name     = var.resource_group
   location = var.location
 }
 
@@ -34,8 +34,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   health_probe_id     = azurerm_lb_probe.lb_probe.id
 
   admin_ssh_key {
-    username = var.admin_username
-    #public_key = local.first_public_key
+    username   = var.admin_username
     public_key = file("id_rsa.pub")
   }
 

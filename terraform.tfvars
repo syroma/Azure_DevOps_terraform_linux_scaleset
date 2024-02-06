@@ -1,6 +1,9 @@
 # resource
 location = "East US 2"
 
+# resource group
+resource_group = "Lab"
+
 # tag
 prefix = "dev"
 

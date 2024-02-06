@@ -6,6 +6,7 @@ variable "html_data" {
 
 variable "location" {}
 
+variable "resource_group" {}
 variable "prefix" {}
 
 variable "address_space" {}
