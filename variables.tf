@@ -6,7 +6,6 @@ variable "html_data" {
 
 variable "location" {}
 
-variable "resource_group" {}
 variable "prefix" {}
 
 variable "address_space" {}
@@ -24,3 +23,5 @@ variable "imgversion" {}
 
 variable "disk_caching" {}
 variable "storage_account_type" {}
+
+variable "public_key_path" {}

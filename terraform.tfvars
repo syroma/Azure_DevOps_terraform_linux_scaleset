@@ -1,9 +1,6 @@
 # resource
 location = "East US 2"
 
-# resource group
-resource_group = "Lab"
-
 # tag
 prefix = "dev"
 
@@ -27,3 +24,5 @@ imgversion = "latest"
 #os_disk
 disk_caching         = "ReadWrite"
 storage_account_type = "Standard_LRS"
+
+public_key_path = "id_rsa.pub"

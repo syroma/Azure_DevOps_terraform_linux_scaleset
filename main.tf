@@ -5,7 +5,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = var.resource_group
+  name     = "${var.prefix}-rg"
   location = var.location
 }
 
@@ -35,7 +35,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
 
   admin_ssh_key {
     username   = var.admin_username
-    public_key = file("id_rsa.pub")
+    public_key = file(var.public_key_path)
   }
 
   source_image_reference {
@@ -67,6 +67,11 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     grace_period = "PT10M"
   }
 }
+
+# to destroy these resources you need to taint the azurerm_virtual_machine_scale_set
+# Example:
+# terraform taint azurerm_virtual_machine_scale_set.example
+
 
 # resource "azurerm_monitor_autoscale_setting" "main" {
 #   name                = "autoscale-config"
