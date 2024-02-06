@@ -1,126 +1,41 @@
-locals {
-  data_inputs = {
-    html_data = var.html_data
-  }
-}
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
 
-resource "azurerm_resource_group" "rg" {
-  name     = "${var.prefix}-resources"
-  location = var.location
-}
+trigger:
+  - main
 
-resource "azurerm_virtual_network" "vnet" {
-  name                = "${var.prefix}-network"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  address_space       = [var.address_space]
-}
+pool:
+  name: Default
+  demands:
+    - agent.name -equals DESKTOP-0K46F98
 
-resource "azurerm_subnet" "subnet" {
-  name                 = "${var.prefix}-subnet1"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.address_prefixes]
-}
+steps:
+  - script: |
+      echo Add other tasks to build, test, and deploy your project.
+      echo See https://aka.ms/yaml
+    displayName: "Run a multi-line script"
 
-resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
-  name                = "${var.prefix}-vmss"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  sku                 = var.vm_size
-  instances           = var.instances
-  admin_username      = var.admin_username
-  user_data           = base64encode(templatefile("userdata.tftpl", local.data_inputs))
-  health_probe_id     = azurerm_lb_probe.lb_probe.id
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: "azurerm"
+      command: "init"
+      backendServiceArm: "WIF2"
+      backendAzureRmResourceGroupName: "Lab"
+      backendAzureRmStorageAccountName: "chochy"
+      backendAzureRmContainerName: "scooba"
+      backendAzureRmKey: "tf/terraform.tfstate"
 
-  admin_ssh_key {
-    username = var.admin_username
-    public_key = file("id_rsa.pub")
-  }
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: "azurerm"
+      command: "plan"
+      environmentServiceNameAzureRM: "WIF2"
 
-  source_image_reference {
-    publisher = var.publisher
-    offer     = var.offer
-    sku       = var.sku
-    version   = var.imgversion
-  }
-
-  os_disk {
-    caching              = var.disk_caching
-    storage_account_type = var.storage_account_type
-  }
-
-  network_interface {
-    name    = "${var.prefix}-nic"
-    primary = true
-
-    ip_configuration {
-      name                                   = "internal"
-      primary                                = true
-      subnet_id                              = azurerm_subnet.subnet.id
-      load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.lb_backpool.id]
-    }
-  }
-
-  automatic_instance_repair {
-    enabled      = true
-    grace_period = "PT10M"
-  }
-}
-
-# resource "azurerm_monitor_autoscale_setting" "main" {
-#   name                = "autoscale-config"
-#   location            = azurerm_resource_group.rg.location
-#   resource_group_name = azurerm_resource_group.rg.name
-#   target_resource_id  = azurerm_linux_virtual_machine_scale_set.vmss.id
-
-#   profile {
-#     name = "AutoScale"
-
-#     capacity {
-#       default = 2
-#       minimum = 1
-#       maximum = 3
-#     }
-
-#     rule {
-#       metric_trigger {
-#         metric_name        = "Percentage CPU"
-#         metric_resource_id = azurerm_linux_virtual_machine_scale_set.vmss.id
-#         time_grain         = "PT1M"
-#         statistic          = "Average"
-#         time_window        = "PT5M"
-#         time_aggregation   = "Average"
-#         operator           = "GreaterThan"
-#         threshold          = 75
-#       }
-
-#       scale_action {
-#         direction = "Increase"
-#         type      = "ChangeCount"
-#         value     = "1"
-#         cooldown  = "PT1M"
-#       }
-#     }
-
-#     rule {
-#       metric_trigger {
-#         metric_name        = "Percentage CPU"
-#         metric_resource_id = azurerm_linux_virtual_machine_scale_set.vmss.id
-#         time_grain         = "PT1M"
-#         statistic          = "Average"
-#         time_window        = "PT5M"
-#         time_aggregation   = "Average"
-#         operator           = "LessThan"
-#         threshold          = 25
-#       }
-
-#       scale_action {
-#         direction = "Decrease"
-#         type      = "ChangeCount"
-#         value     = "1"
-#         cooldown  = "PT1M"
-#       }
-#     }
-#   }
-# }
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: "azurerm"
+      command: "apply"
+      commandOptions: "tfplan -auto-approve"
+      environmentServiceNameAzureRM: "WIF2"

@@ -19,4 +19,4 @@ crash.log
 terraform.txt
 
 # ignore public key
-*.pub
+# *.pub
