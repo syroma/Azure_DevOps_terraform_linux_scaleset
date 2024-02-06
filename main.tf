@@ -1,6 +1,6 @@
 locals {
   data_inputs = {
-    heading_one = var.heading_one
+    html_data = var.html_data
   }
 }
 
