@@ -16,6 +16,7 @@ terraform.rc
 
 # ignore crashlog
 crash.log
+terraform.txt
 
 # ignore public key
 *.pub
