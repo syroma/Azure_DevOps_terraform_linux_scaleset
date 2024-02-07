@@ -1,14 +1,14 @@
 resource "azurerm_public_ip" "pip" {
   name                = "PublicIPForLB"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Static"
 }
 
 resource "azurerm_lb" "lb" {
   name                = "lb"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   frontend_ip_configuration {
     name                 = "PublicIPAddress"

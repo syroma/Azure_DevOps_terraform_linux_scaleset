@@ -1,6 +1,9 @@
 # resource
 location = "East US 2"
 
+# Existing Resource Group !!!! Change this to an existing Resource Group
+resource_group = "Lab"
+
 # tag
 prefix = "dev"
 

@@ -4,29 +4,28 @@ locals {
   }
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "${var.prefix}-rg"
-  location = var.location
+data "azurerm_resource_group" "rg" {
+  name = var.resource_group
 }
 
 resource "azurerm_virtual_network" "vnet" {
   name                = "${var.prefix}-network"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   address_space       = [var.address_space]
 }
 
 resource "azurerm_subnet" "subnet" {
   name                 = "${var.prefix}-subnet1"
-  resource_group_name  = azurerm_resource_group.rg.name
+  resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = [var.address_prefixes]
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   name                = "${var.prefix}-vmss"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   sku                 = var.vm_size
   instances           = var.instances
   admin_username      = var.admin_username
