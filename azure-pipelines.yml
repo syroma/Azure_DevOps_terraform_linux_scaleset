@@ -12,30 +12,25 @@ pool:
     - agent.name -equals DESKTOP-0K46F98
 
 steps:
-  - script: |
-      echo Add other tasks to build, test, and deploy your project.
-      echo See https://aka.ms/yaml
-    displayName: "Run a multi-line script"
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'TerraformDeploy'
+    backendAzureRmResourceGroupName: 'Lab'
+    backendAzureRmStorageAccountName: 'chochy'
+    backendAzureRmContainerName: 'scooba'
+    backendAzureRmKey: 'tf/terraform.tfstate'
 
-  - task: TerraformTaskV4@4
-    inputs:
-      provider: "azurerm"
-      command: "init"
-      backendServiceArm: "WIF2"
-      backendAzureRmResourceGroupName: "Lab"
-      backendAzureRmStorageAccountName: "chochy"
-      backendAzureRmContainerName: "scooba"
-      backendAzureRmKey: "tf/terraform.tfstate"
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    environmentServiceNameAzureRM: 'TerraformDeploy'
 
-  - task: TerraformTaskV4@4
-    inputs:
-      provider: "azurerm"
-      command: "plan"
-      environmentServiceNameAzureRM: "WIF2"
-
-  - task: TerraformTaskV4@4
-    inputs:
-      provider: "azurerm"
-      command: "apply"
-      commandOptions: "tfplan -auto-approve"
-      environmentServiceNameAzureRM: "WIF2"
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    commandOptions: '-auto-approve'
+    environmentServiceNameAzureRM: 'TerraformDeploy'
